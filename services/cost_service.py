@@ -4,7 +4,7 @@ from services.food_service import estimate_food
 from utils.currency import get_currency
 
 def estimate_total_cost(data):
-    hotel = estimate_hotel_cost(data.days, data.people, data.budget)
+    hotel = estimate_hotel_cost(data.days, data.people, data.budget, data.destination)
     transport = estimate_transport(data.destination, data.travel_mode)
     food = estimate_food(data.days, data.people, data.budget)
 
