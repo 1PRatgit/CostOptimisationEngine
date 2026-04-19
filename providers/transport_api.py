@@ -8,8 +8,6 @@ from core.config import settings
 SKYSCANNER_API_URL = settings.SKYSCANNER_API_URL
 SKYSCANNER_API_HOST = settings.SKYSCANNER_API_HOST
 SKYSCANNER_API_KEY = settings.SKYSCANNER_API_KEY
-DEFAULT_ORIGIN = settings.DEFAULT_ORIGIN
-DEFAULT_DEPARTURE_DATE = settings.DEFAULT_DEPARTURE_DATE
 
 
 def _build_headers():
@@ -45,14 +43,12 @@ def _do_rapidapi_request(url):
         return json.loads(raw)
 
 
-def fetch_flight_cost(destination, origin=DEFAULT_ORIGIN):
+def fetch_flight_cost(destination):
     if not (SKYSCANNER_API_URL and SKYSCANNER_API_HOST and SKYSCANNER_API_KEY):
         return None
 
     query = {
-        "origin": origin,
         "destination": destination,
-        "departure_date": DEFAULT_DEPARTURE_DATE,
         "currency": "INR",
         "adults": 1,
         "cabin_class": "economy",
