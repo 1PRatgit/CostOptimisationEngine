@@ -5,4 +5,4 @@ FOOD_COST = {
 }
 
 def estimate_food(days, people, budget):
-    return FOOD_COST[budget] * days * people
+    return budget * days * people
