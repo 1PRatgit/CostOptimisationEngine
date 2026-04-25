@@ -1,19 +1,23 @@
 from providers.hotel_api import fetch_hotel_cost
+from services.food_service import normalize_budget
 
-HOTEL_PRICE = {
+
+HOTEL_PRICE_PER_NIGHT = {
     "low": 1000,
     "medium": 2500,
-    "high": 6000
+    "high": 6000,
 }
 
 
 def _fallback_hotel_cost(days, people, budget):
-    base = HOTEL_PRICE.get(budget, HOTEL_PRICE["medium"])
-    return base * days * (1 if people <= 2 else people / 2)
+    budget = normalize_budget(budget)
+    rooms = max(1, (int(people) + 1) // 2)
+    return HOTEL_PRICE_PER_NIGHT[budget] * int(days) * rooms
 
 
 def estimate_hotel_cost(days, people, budget, destination):
     api_cost = fetch_hotel_cost(destination, budget, days, people)
-    if api_cost is not None:
-        return api_cost
-    return _fallback_hotel_cost(days, people, budget)
+    if isinstance(api_cost, (int, float)) and api_cost > 0:
+        return float(api_cost)
+
+    return float(_fallback_hotel_cost(days, people, budget))
