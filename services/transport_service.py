@@ -20,11 +20,11 @@ def normalize_travel_mode(travel_mode):
     return "flight"
 
 
-def estimate_transport(destination, travel_mode):
+def estimate_transport(destination, travel_mode, source=None, depart_date=None):
     travel_mode = normalize_travel_mode(travel_mode)
 
     if travel_mode == "flight":
-        api_cost = fetch_flight_cost(destination)
+        api_cost = fetch_flight_cost(destination, source=source, depart_date=depart_date)
         if isinstance(api_cost, (int, float)) and api_cost > 0:
             return float(api_cost)
 

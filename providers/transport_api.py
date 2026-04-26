@@ -6,11 +6,18 @@ from urllib.request import Request, urlopen
 from core.config import settings
 
 
-FLIGHT_API_URL = str(settings.FLIGHT_API_URL or settings.SKYSCANNER_API_URL)
+FLIGHT_API_URL = str(settings.FLIGHT_API_URL or settings.SKYSCANNER_API_URL or "")
 FLIGHT_API_HOST = settings.FLIGHT_API_HOST or settings.SKYSCANNER_API_HOST
 FLIGHT_API_KEY = settings.FLIGHT_API_KEY or settings.RAPIDAPI_HOTEL_KEY
 
 CITY_TO_FLIGHT_ID = {
+    "blr": "BLR.AIRPORT",
+    "bom": "BOM.AIRPORT",
+    "del": "DEL.AIRPORT",
+    "goi": "GOI.AIRPORT",
+    "goa": "GOI.AIRPORT",
+    "par": "PAR.CITY",
+    "lon": "LON.CITY",
     "mumbai": "BOM.AIRPORT",
     "bombay": "BOM.AIRPORT",
     "delhi": "DEL.AIRPORT",
@@ -60,6 +67,9 @@ def _resolve_flight_id(city_or_id):
     normalized = value.lower()
     if normalized in CITY_TO_FLIGHT_ID:
         return CITY_TO_FLIGHT_ID[normalized]
+
+    if len(value) == 3 and value.isalpha():
+        return f"{value.upper()}.AIRPORT"
 
     payload = _do_rapidapi_request(
         _flight_search_destination_url(),
@@ -120,15 +130,15 @@ def _parse_min_price(payload):
     return min(prices)
 
 
-def fetch_flight_cost(destination):
+def fetch_flight_cost(destination, source=None, depart_date=None):
     if not (FLIGHT_API_URL and FLIGHT_API_HOST and FLIGHT_API_KEY):
         return None
 
     try:
         query = {
-            "fromId": _resolve_flight_id(settings.DEFAULT_ORIGIN),
+            "fromId": _resolve_flight_id(source or settings.DEFAULT_ORIGIN),
             "toId": _resolve_flight_id(destination),
-            "departDate": settings.DEFAULT_DEPARTURE_DATE,
+            "departDate": depart_date or settings.DEFAULT_DEPARTURE_DATE,
             "cabinClass": settings.FLIGHT_CABIN_CLASS,
             "currency_code": settings.FLIGHT_CURRENCY_CODE,
         }
